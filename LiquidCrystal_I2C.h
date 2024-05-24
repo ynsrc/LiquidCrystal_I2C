@@ -4,7 +4,12 @@
 
 #include <inttypes.h>
 #include "Print.h" 
+
+#ifdef __AVR_ATtiny85__
+#include <TinyWireM.h>
+#else
 #include <Wire.h>
+#endif
 
 // commands
 #define LCD_CLEARDISPLAY 0x01

@@ -2,11 +2,18 @@
 
 #include "LiquidCrystal_I2C.h"
 #include <inttypes.h>
+
+#ifdef __AVR_ATtiny85__
+#define WIRE TinyWireM
+#else
+#define WIRE Wire
+#endif
+
 #if defined(ARDUINO) && ARDUINO >= 100
 
 #include "Arduino.h"
 
-#define printIIC(args)	Wire.write(args)
+#define printIIC(args)	WIRE.write(args)
 inline size_t LiquidCrystal_I2C::write(uint8_t value) {
 	send(value, Rs);
 	return 1;
@@ -15,14 +22,17 @@ inline size_t LiquidCrystal_I2C::write(uint8_t value) {
 #else
 #include "WProgram.h"
 
-#define printIIC(args)	Wire.send(args)
+#define printIIC(args)	WIRE.send(args)
 inline void LiquidCrystal_I2C::write(uint8_t value) {
 	send(value, Rs);
 }
-
 #endif
-#include "Wire.h"
 
+#ifdef __AVR_ATtiny85__
+#include <TinyWireM.h>
+#else
+#include <Wire.h>
+#endif
 
 
 // When the display powers up, it is configured as follows:
@@ -63,7 +73,7 @@ void LiquidCrystal_I2C::init(){
 
 void LiquidCrystal_I2C::init_priv()
 {
-	Wire.begin();
+	WIRE.begin();
 	_displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
 	begin(_cols, _rows);  
 }
@@ -265,9 +275,9 @@ void LiquidCrystal_I2C::write4bits(uint8_t value) {
 }
 
 void LiquidCrystal_I2C::expanderWrite(uint8_t _data){                                        
-	Wire.beginTransmission(_Addr);
+	WIRE.beginTransmission(_Addr);
 	printIIC((int)(_data) | _backlightval);
-	Wire.endTransmission();   
+	WIRE.endTransmission();   
 }
 
 void LiquidCrystal_I2C::pulseEnable(uint8_t _data){
